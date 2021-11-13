@@ -34,3 +34,18 @@ test("If missing username or password returns (username and password required)",
   expect(res.body.message).toMatch(/username and password required/i);
   expect(res.status).toBe(401);
 }, 750);
+
+describe("Login", () => {
+  test("If login failed due to username or password, invalid cred", async () => {
+    let res = await request(server)
+      .post("/api/auth/login")
+      .send({ username: "Leto", password: "1234" });
+    expect(res.body.message).toMatch(/invalid credentials/i);
+    expect(res.status).toBe(401);
+    res = await request(server)
+      .post("/api/auth/login")
+      .send({ username: "Emma", password: "12345" });
+    expect(res.body.message).toMatch(/invalid credentials/i);
+    expect(res.status).toBe(401);
+  }, 750);
+});
