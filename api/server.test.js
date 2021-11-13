@@ -62,3 +62,34 @@ test("If missing username or password returns (username and password required", 
   expect(res.body.message).toMatch(/username and password required/i);
   expect(res.status).toBe(401);
 }, 750);
+
+describe("Jokes", () => {
+  test("Responds with dad jokes with valid token", async () => {
+    const testToken =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpheGhhY2tzIiwiaWF0IjoxNjM2NzYxMzYyLCJleHAiOjE2MzY4NDc3NjJ9.kGiGK1ES3B9g4fKVc0fjhheic2WRPo4mb1N2H1ZjGTc";
+    const res = await request(server)
+      .post("/api/auth/login")
+      .send({ password: "1234", username: "Jane" });
+    console.log(res.body);
+    const daddy = await request(server)
+      .get("/api/jokes")
+      .set("Authorization", testToken);
+    expect(daddy.body).toMatchObject(jokes);
+  }, 750);
+
+  test("Returns [Token required] if none exists", async () => {
+    const res = await request(server).get("/api/jokes");
+    expect(res.body).toMatchObject({
+      message: "Token required",
+    });
+  });
+
+  test("Returns [Token invalid] if wrong token", async () => {
+    const res = await request(server)
+      .get("/api/jokes")
+      .set("Authorization", "wrong");
+    expect(res.body).toMatchObject({
+      message: "Token invalid",
+    });
+  });
+});
