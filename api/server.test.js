@@ -49,3 +49,16 @@ describe("Login", () => {
     expect(res.status).toBe(401);
   }, 750);
 });
+
+test("If missing username or password returns (username and password required", async () => {
+  let res = await request(server)
+    .post("/api/auth/login")
+    .send({ password: "1234" });
+  expect(res.body.message).toMatch(/username and password required/i);
+  expect(res.status).toBe(401);
+  res = await request(server)
+    .post("/api/auth/login")
+    .send({ username: "Leonardo" });
+  expect(res.body.message).toMatch(/username and password required/i);
+  expect(res.status).toBe(401);
+}, 750);
